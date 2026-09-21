@@ -1,8 +1,11 @@
-// Sincronizar las letras con la canción
 var audio = document.querySelector("audio");
 var lyrics = document.querySelector("#lyrics");
 
-// Array de objetos que contiene cada línea y su tiempo de aparición en segundos
+// Ajuste global en segundos:
+// Si la letra sigue apareciendo antes de tiempo, sube este número (ej. 2.0 o 2.5).
+// Si ahora aparece tarde, bájalo (ej. 1.0 o 0.8).
+var delayOffset = 1.5;
+
 var lyricsData = [
   { text: "At the time", time: 15 },
   { text: "The whisper of birds", time: 18 },
@@ -30,43 +33,61 @@ var lyricsData = [
   { text: "Nice butterflies in my hands", time: 176 },
   { text: "Too much light for twilight", time: 183 },
   { text: "In the mood for the flowers", time: 188 },
-  { text: "Love.", time: 140 },
+  { text: "Love.", time: 191 }
 ];
 
-// Animar las letras
-function updateLyrics() {
-  var time = Math.floor(audio.currentTime);
-  var currentLine = lyricsData.find(
-    (line) => time >= line.time && time < line.time + 6
-  );
+function syncLyrics() {
+  if (audio && !audio.paused && !audio.ended) {
+    // Aplica la compensación para que la letra no se adelante
+    var currentTime = audio.currentTime - delayOffset;
 
-  if (currentLine) {
-    // Calcula la opacidad basada en el tiempo en la línea actual
-    var fadeInDuration = 0.1; // Duración del efecto de aparición en segundos
-    var opacity = Math.min(1, (time - currentLine.time) / fadeInDuration);
+    var currentLine = lyricsData.find(
+      (line) => currentTime >= line.time && currentTime < line.time + 4.8
+    );
 
-    // Aplica el efecto de aparición
-    lyrics.style.opacity = opacity;
-    lyrics.innerHTML = currentLine.text;
-  } else {
-    // Restablece la opacidad y el contenido si no hay una línea actual
-    lyrics.style.opacity = 0;
-    lyrics.innerHTML = "";
+    if (currentLine) {
+      if (lyrics.innerHTML !== currentLine.text) {
+        lyrics.innerHTML = currentLine.text;
+        lyrics.style.opacity = 1;
+      }
+    } else {
+      lyrics.style.opacity = 0;
+    }
+  }
+  requestAnimationFrame(syncLyrics);
+}
+
+if (audio) {
+  audio.addEventListener("play", () => {
+    requestAnimationFrame(syncLyrics);
+  });
+  if (!audio.paused) {
+    requestAnimationFrame(syncLyrics);
   }
 }
 
-setInterval(updateLyrics, 1000);
-
-//funcion titulo
-// Función para ocultar el título después de 216 segundos
 function ocultarTitulo() {
   var titulo = document.querySelector(".titulo");
-  titulo.style.animation =
-    "fadeOut 3s ease-in-out forwards"; /* Duración y función de temporización de la desaparición */
-  setTimeout(function () {
-    titulo.style.display = "none";
-  }, 3000); // Espera 3 segundos antes de ocultar completamente
+  if (titulo) {
+    titulo.style.animation = "fadeOut 3s ease-in-out forwards";
+    setTimeout(() => {
+      titulo.style.display = "none";
+    }, 3000);
+  }
 }
 
-// Llama a la función después de 216 segundos (216,000 milisegundos)
 setTimeout(ocultarTitulo, 216000);
+// Inserta la letra 'Y' en cada corazon SVG automaticamente
+document.querySelectorAll("svg.heart").forEach((heartSvg) => {
+  var textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  textElem.setAttribute("x", "16");
+  textElem.setAttribute("y", "17");
+  textElem.setAttribute("text-anchor", "middle");
+  textElem.setAttribute("dominant-baseline", "central");
+  textElem.setAttribute("fill", "#ffffff");
+  textElem.setAttribute("font-size", "11");
+  textElem.setAttribute("font-weight", "bold");
+  textElem.setAttribute("font-family", "Arial, sans-serif");
+  textElem.textContent = "Y";
+  heartSvg.appendChild(textElem);
+});

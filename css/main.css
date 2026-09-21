@@ -2119,3 +2119,26 @@ h1 {
   pointer-events: none;
   transition: opacity 0.5s ease-in-out;
 }
+/* Asegura que el contenedor del corazón actúe como referencia de centrado */
+.heart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Estilo para la letra dentro del corazón */
+.heart-text {
+  position: absolute;
+  font-family: Arial, sans-serif; /* O la fuente que prefieras */
+  font-size: 1.1rem;              /* Ajusta el tamaño según qué tan grande sea el corazón */
+  font-weight: bold;
+  color: #ffffff;                 /* Blanco para buen contraste */
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+  z-index: 10;                    /* Siempre por encima del fondo del corazón */
+  pointer-events: none;
+  
+  /* Si tus corazones tienen una rotación base (ej. rotate(-45deg)), 
+     puedes contrarrestarla aquí para que la 'Y' no quede de lado: */
+  /* transform: rotate(45deg); */
+}
